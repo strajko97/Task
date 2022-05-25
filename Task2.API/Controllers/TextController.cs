@@ -20,9 +20,21 @@ namespace Task2.API.Controllers
         }
 
         [HttpPost("")]
-        public int returnNumberOfWords([FromBody] Text text)
+        public int ReturnNumberOfWords([FromBody] Text text)
         {
             return _textService.NumberOFWordsInString(text);
+        }
+
+        [HttpGet("")]
+        public async Task<IEnumerable<Text>> GetAllTexts()
+        {
+            return await _textService.GetAllTexts_textService();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<Text> GetTextById(int id)
+        {
+            return await _textService.GetTextById_textService(id);
         }
 
     }

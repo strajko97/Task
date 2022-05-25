@@ -19,12 +19,14 @@ namespace Task2.Data.Repositories
         }
         
            
-        public async Task<IEnumerable<Text>> GetAllTexts()
+       
+
+        public async Task<IEnumerable<Text>> GetAllTextsAsync()
         {
             return await MyDataBaseContext.Texts.ToListAsync<Text>();
         }
 
-        public async Task<Text> GetTextById(int id)
+        public async Task<Text> GetTextByIdAsync(int id)
         {
            // return await MyDataBaseContext.Texts.Where(m => m.Id == id);//da li je isto
             return await MyDataBaseContext.Texts.FindAsync(id);

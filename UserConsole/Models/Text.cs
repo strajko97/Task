@@ -8,5 +8,7 @@ namespace UserConsole.Models
     {
         public int Type { get; set; }
         public string Input { get; set; }
+        public int Id { get; set; }
     }
+   
 }

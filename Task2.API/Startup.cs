@@ -33,8 +33,10 @@ namespace Task2.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<MyDataBaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default"), x => x.MigrationsAssembly("Task2.Data")));//ima jos nesto da se dodaje
+            services.AddDbContext<MyDataBaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default"), 
+                x => x.MigrationsAssembly("Task2.Data")));//ima jos nesto da se dodaje
             ////////////////////////////////////////////
+            ///
             services.AddTransient<ITextService, TextService>();
             services.AddScoped<ITextRepository, TextRepository>();
             

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Task2.Core.Model;
 using Task2.Core.Repositories;
@@ -22,19 +21,14 @@ namespace Task2.Service.Services
             return text.Input.Split(new char[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
         }
 
-      
-
-    
-
         public async Task<IEnumerable<Text>> GetAllTexts_textService()
         {
-            return await _textRepository.GetAllTextsAsync();
+            return await _textRepository.GetAllTextsAsync();//ovde mogu da dodam try cathch, ako je prazna baza
         }
 
         public async Task<Text> GetTextById_textService(int id)
         {
-            return await _textRepository.GetTextByIdAsync(id);
+            return await _textRepository.GetTextByIdAsync(id);//ako se ne nadje sa tim id-jem
         }
     }
-
 }

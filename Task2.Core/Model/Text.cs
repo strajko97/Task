@@ -6,10 +6,9 @@ namespace Task2.Core.Model
 {
     public class Text
     {
-        public int Type { get; set; }
+        // public int Type { get; set; }//ibacio sam u update1 migraciji
         public string Input { get; set; }
-        //da li ovde treba da stavim polje za pk
-         public int Id{get;set;}
+        public int Id { get; set; }
 
     }
 }

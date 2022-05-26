@@ -6,7 +6,7 @@ namespace UserConsole.Models
 {
     public class Text
     {
-        public int Type { get; set; }
+       // public int Type { get; set; }
         public string Input { get; set; }
         public int Id { get; set; }
     }

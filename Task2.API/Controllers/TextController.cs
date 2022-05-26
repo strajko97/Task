@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Task2.Core.Model;
 using Task2.Core.Services;
@@ -36,6 +38,19 @@ namespace Task2.API.Controllers
         {
             return await _textService.GetTextById_textService(id);
         }
-
+        
+        [HttpPost("file")]
+        public async Task<int> ReturnNumberOfWordsFromTextFileAsync(IFormFile textFile)
+        {
+            var result = new StringBuilder();
+            using (var reader = new StreamReader(textFile.OpenReadStream()))
+            {
+                while (reader.Peek() >= 0)//StearmReader.Peek() - metoda koja kaze koliko karaktera je ostalo da se procita 
+                    result.AppendLine( await reader.ReadLineAsync());
+            }
+            Text text = new Text() { Input=result.ToString()};
+            return _textService.NumberOFWordsInString(text);
+        }
+        
     }
 }

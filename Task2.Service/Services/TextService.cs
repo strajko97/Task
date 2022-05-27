@@ -17,6 +17,7 @@ namespace Task2.Service.Services
             _textRepository = textRepository;
         }
         public int NumberOFWordsInString(Text text)
+           ///////////////////////////////////////////////////
         {
             return text.Input.Split(new char[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
         }

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UserConsole.Models;
 using System.IO;
+using System.Linq.Expressions;
 
 namespace UserConsole
 {
@@ -16,20 +17,27 @@ namespace UserConsole
         public async Task<int> SendText(Text text)
         {
             HttpResponseMessage response = await client.PostAsJsonAsync("http://localhost:5000/api/Text", text);
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                response.EnsureSuccessStatusCode(); 
+            }
+            catch(HttpRequestException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             return Convert.ToInt32(await response.Content.ReadAsStringAsync());
         }
 
         private async Task<int> SendFile(string filePath)
         {
-            if(File.Exists(filePath) == false)
+            if (File.Exists(filePath) == false)
             {
-                throw new Exception();//
+                throw new Exception();
             }
 
-            string fileName = Path.GetFileName(filePath) ?? throw new InvalidDataException(); // check
-           
+            string fileName = Path.GetFileName(filePath); // check
+
             MultipartFormDataContent content = new MultipartFormDataContent();
             StreamContent fileStream = new StreamContent(File.OpenRead(filePath));
 
@@ -42,11 +50,17 @@ namespace UserConsole
 
         public async void GetNumberOfTextInDatabase()
         {
-            HttpResponseMessage response = client.GetAsync("http://localhost:5000/api/Text").Result;
-            var result = await response.Content.ReadAsStringAsync();
-            texts = JsonConvert.DeserializeObject<List<Text>>(result);
-            //radi
-
+            try
+            {
+                HttpResponseMessage response = client.GetAsync("http://localhost:5000/api/Text").Result;
+                var result = await response.Content.ReadAsStringAsync();
+                response.EnsureSuccessStatusCode();
+                texts = JsonConvert.DeserializeObject<List<Text>>(result);
+            }
+            catch(HttpRequestException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public async void GetTextFromDatabaseById(int id)
@@ -59,31 +73,36 @@ namespace UserConsole
 
         public void ShowListOfTexts()
         {
+            
             foreach (Text t in texts)
             {
                 Console.WriteLine(t.Id + " " + t.Input);
             }
         }
 
-        public async Task GetNumberOfWordFromSentFileAsync()
-        {
-
-        }
-
-
         public static void StartProgram()
         {
             bool mainLoop = true;
 
-            while(mainLoop)
+            while (mainLoop)
             {
                 Console.WriteLine("\n\n\n Hello user! You have 3 options to choose:");
                 Console.WriteLine("1.Input string,");
                 Console.WriteLine("2.Get all strings from database and choose one,");
                 Console.WriteLine("3.Get string from file, and send that string to backend,");
                 Console.WriteLine("4.Send file to backend!");
-                Console.WriteLine("Please choose one!");
-                int choice = int.Parse(Console.ReadLine());
+                int choice = 0;
+                int id = 0;
+                try
+                {
+                    Console.WriteLine("Please choose one!");
+                    choice = int.Parse(Console.ReadLine());
+
+                }
+                catch (System.FormatException ex)
+                {
+                    Console.WriteLine("There was an error input: " + ex.Message);
+                }
                 int numberOfWords;
                 Program program = new Program();
 
@@ -91,13 +110,9 @@ namespace UserConsole
                     switch (choice)
                     {
                         case 1:
-
-                            Console.WriteLine("Enter a type (1-3):");
-                            // program.text.Type = int.Parse(Console.ReadLine()); Ovdeeee sam ovo promenio
-
+                            
                             Console.WriteLine("Enter a string:");
                             program.text.Input = Console.ReadLine();
-
                             numberOfWords = program.SendText(program.text).Result;
                             Console.WriteLine("TEXT:\n{0}\n THIS TEXT HAS {1} WORDS!", program.text.Input, numberOfWords);
 
@@ -109,23 +124,41 @@ namespace UserConsole
                             program.GetNumberOfTextInDatabase();
                             program.ShowListOfTexts();
                             Console.WriteLine("Choose one of strings from database by their Id:");
-                            int id = int.Parse(Console.ReadLine());
-                            // if (program.texts.Count() < id)
-                            //{
-                            //   throw new Exception("Id out of range");
-                            //}
-                            program.GetTextFromDatabaseById(id);
-                            numberOfWords = program.SendText(program.text).Result;
-                            Console.WriteLine("TEXT:\n{0}\n THIS TEXT HAS {1} WORDS!", program.text.Input, numberOfWords);
+                            try
+                            {
+                                id = int.Parse(Console.ReadLine());
+                            }
+                            catch (System.FormatException ex)
+                            {
+                                Console.WriteLine("There was an error input: " + ex.Message);
+                            }
+                            try
+                            {
+                                program.GetTextFromDatabaseById(id);
+                                numberOfWords = program.SendText(program.text).Result;
+                                Console.WriteLine("TEXT:\n{0}\n THIS TEXT HAS {1} WORDS!", program.text.Input, numberOfWords);
+                            }
+                            catch (System.AggregateException ex)
+                            {
+                                Console.WriteLine("You choose invalid index and error ocurred:" + ex.Message);
+                            }
 
                             break;
                         case 3:
-                            //nije dobro
-                            //treba taj fajl da posaljem na backend a ne ovde da sadrzaj pretvaram u string variablu
-                            program.text.Input = System.IO.File.ReadAllText("C:/Users/Paun/source/repos/Task2 - Copy/Text.txt");
-                            numberOfWords = program.SendText(program.text).GetAwaiter().GetResult();
-                            Console.WriteLine(program.text.Input + "\n THIS TEXTHAS {0} WORDS!", numberOfWords);
-
+                            try
+                            {
+                                program.text.Input = System.IO.File.ReadAllText("C:/Users/Paun/source/repos/Task2 - Copy/Text.txt");
+                                numberOfWords = program.SendText(program.text).GetAwaiter().GetResult();
+                                Console.WriteLine(program.text.Input + "\n THIS TEXTHAS {0} WORDS!", numberOfWords);
+                            }
+                            catch (System.IO.DirectoryNotFoundException ex)
+                            {
+                                Console.Write(ex.Message);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Write(ex.Message);
+                            }
                             break;
                         case 4:
                             {
@@ -140,19 +173,19 @@ namespace UserConsole
                                 }
                             }
                             break;
-                        default: mainLoop = false;
-                                break;
+                        default:
+                            mainLoop = false;
+                            break;
                     }
                 }
             };
-
         }
+
+        
         public static void Main(string[] args)
         {
+            
             StartProgram();
-
-            //Main ce da se zavrsi pre nego sto se taks zavrsi jer Main nije async
-            //zato debugger nije hteo da udje
         }
     }
 }

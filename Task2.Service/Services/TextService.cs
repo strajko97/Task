@@ -10,43 +10,8 @@ namespace Task2.Service.Services
     {
         public int NumberOFWordsInString(Text text)
         {
-            int count = 0;
-            bool wasInWord = false;
-            bool inWord = false;
-
-            for (int i = 0; i < text.Input.Length; i++)
-            {
-                if (inWord)
-                {
-                    wasInWord = true;
-                }
-
-                if (Char.IsWhiteSpace(text.Input[i]))
-                {
-                    if (wasInWord)
-                    {
-                        count++;
-                        wasInWord = false;
-                    }
-                    inWord = false;
-                }
-                else
-                {
-                    inWord = true;
-                }
-            }
-
-            // Check to see if we got out with seeing a word
-            if (wasInWord)
-            {
-                count++;
-            }
-
-            return count;
-            }
-
-
+            return text.Input.Split(new char[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
     }
-
 
 }
